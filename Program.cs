@@ -1,97 +1,169 @@
-﻿using System.ComponentModel.Design;
-using System.Reflection;
-
-
-public class Program
+﻿public class Program
 {
     static void Main(string[] args)
     {
-        
-
         var service = new TaskService();
-
         bool rimani = true;
 
         while (rimani)
         {
-
-
+            Console.WriteLine();
             Console.WriteLine("Menu SharpTamasy");
             Console.WriteLine("1. Aggiungi task");
             Console.WriteLine("2. Mostra tutte le task");
             Console.WriteLine("3. Cerca task per id");
             Console.WriteLine("4. Elimina task");
             Console.WriteLine("0. Esci");
-            Console.WriteLine("Scegli un opzione: ");
+            Console.Write("Scegli un'opzione: ");
 
             string? opzione = Console.ReadLine();
 
             switch (opzione)
             {
                 case "1":
-                    Console.WriteLine("Titolo: ");
+                    Console.Write("Titolo: ");
                     string title = Console.ReadLine() ?? string.Empty;
-                    Console.WriteLine("Descrizione: ");
+
+                    Console.Write("Descrizione: ");
                     string description = Console.ReadLine() ?? string.Empty;
-                    service.AddTask(title, description);
+
+                    Console.WriteLine("Tipo di task:");
+                    Console.WriteLine("1. Task normale");
+                    Console.WriteLine("2. Bug task");
+                    Console.WriteLine("3. Feature task");
+                    Console.Write("Scelta: ");
+
+                    string? tipoScelta = Console.ReadLine();
+
+                    TaskCreator? creator = null;
+
+                    var data = new TaskCreationData
+                    {
+                        Title = title,
+                        Description = description
+                    };
+
+                    switch (tipoScelta)
+                    {
+                        case "1":
+                            creator = new BasicTaskCreator();
+                            break;
+
+                        case "2":
+                            Console.Write("Severità (1.Low, 2.Medium, 3.High): ");
+                            string? severityChoice = Console.ReadLine();
+
+                            data.Severity = severityChoice switch
+                            {
+                                "1" => BugSeverity.Low,
+                                "2" => BugSeverity.Medium,
+                                "3" => BugSeverity.High,
+                                _ => BugSeverity.Low
+                            };
+
+                            creator = new BugTaskCreator();
+                            break;
+
+                        case "3":
+                            Console.Write("Priorità (1.Low, 2.Normal, 3.Urgent): ");
+                            string? priorityChoice = Console.ReadLine();
+
+                            data.Priority = priorityChoice switch
+                            {
+                                "1" => FeaturePriority.Low,
+                                "2" => FeaturePriority.Normal,
+                                "3" => FeaturePriority.Urgent,
+                                _ => FeaturePriority.Normal
+                            };
+
+                            creator = new FeatureTaskCreator();
+                            break;
+
+                        default:
+                            Console.WriteLine("Tipo non valido.");
+                            break;
+                    }
+
+                    if (creator == null)
+                    {
+                        break;
+                    }
+
+                    TaskItem createdTask = creator.CreateTask(data);
+                    service.AddTask(createdTask);
+
                     Console.WriteLine("Task aggiunta con successo.");
                     break;
 
-
                 case "2":
                     var tasks = service.GetAllTasks();
+
                     if (tasks.Count == 0)
                     {
-                        Console.WriteLine("Nessun task presente.");
+                        Console.WriteLine("Nessuna task presente.");
                     }
                     else
                     {
                         foreach (var task in tasks)
                         {
-                            Console.WriteLine($"{task.Id}-{task.Title}-{task.Description}-{task.CreatedAt}-{task.Status}-{task.Type}");
+                            Console.WriteLine($"{task.Id} - {task.Title} - {task.Description} - {task.CreatedAt} - {task.Status} - {task.Type}");
                         }
                     }
-
                     break;
-
 
                 case "3":
+                    Console.Write("Inserisci Id: ");
 
-                    Console.WriteLine("Inserici Id: ");
-                    int id = int.Parse(Console.ReadLine() ?? "0");
-                    var taskById = service.GetTaskById(id);
-                    if (taskById != null)
+                    if (int.TryParse(Console.ReadLine(), out int id))
                     {
-                        Console.WriteLine($"{taskById.Id}-{taskById.Title}-{taskById.Description}-{taskById.CreatedAt}-{taskById.Status}-{taskById.Type}");
+                        var taskById = service.GetTaskById(id);
+
+                        if (taskById == null)
+                        {
+                            Console.WriteLine("Task non trovata.");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"{taskById.Id} - {taskById.Title} - {taskById.Description} - {taskById.CreatedAt} - {taskById.Status} - {taskById.Type}");
+
+                            if (taskById is BugTask bug)
+                            {
+                                Console.WriteLine($"Severity: {bug.Severity}");
+                            }
+                            else if (taskById is FeatureTask feature)
+                            {
+                                Console.WriteLine($"Priority: {feature.Priority}");
+                            }
+                        }
                     }
                     else
                     {
-                        Console.WriteLine("Task non trovato\n");
+                        Console.WriteLine("Id non valido.");
                     }
                     break;
-
-
 
                 case "4":
+                    Console.Write("Inserisci Id da eliminare: ");
 
-                    Console.WriteLine("Inserisci Id da eliminare: ");
-                    int deleteId = int.Parse(Console.ReadLine() ?? "0");
-                    var existingTask = service.GetTaskById(deleteId);
-                    if (existingTask == null)
+                    if (int.TryParse(Console.ReadLine(), out int deleteId))
                     {
-                        Console.WriteLine($"Task id non trovato");
+                        var existingTask = service.GetTaskById(deleteId);
+
+                        if (existingTask == null)
+                        {
+                            Console.WriteLine("Task non trovata.");
+                        }
+                        else
+                        {
+                            service.DeleteTask(deleteId);
+                            Console.WriteLine("Task eliminata con successo.");
+                        }
                     }
                     else
                     {
-                        service.DeleteTask(deleteId);
-                        Console.WriteLine("Task eliminato con successo\n");
-
+                        Console.WriteLine("Id non valido.");
                     }
-
-
                     break;
-
-
 
                 case "0":
                     rimani = false;
@@ -99,15 +171,9 @@ public class Program
                     break;
 
                 default:
-                    Console.WriteLine("Opzione non valida");
+                    Console.WriteLine("Opzione non valida.");
                     break;
-
-
-
             }
-
-
-
         }
     }
 }
