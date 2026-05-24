@@ -7,7 +7,7 @@ public class AppDbContext : DbContext
     
     public DbSet<BugTask> Bugs { get; set; }
 
-    public DbSet<FeatureTask> Feature { get; set; }
+    public DbSet<FeatureTask> Features { get; set; }
 
      protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
