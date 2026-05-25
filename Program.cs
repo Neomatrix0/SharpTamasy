@@ -2,7 +2,9 @@
 {
     static void Main(string[] args)
     {
-        var service = new TaskService();
+        using var db = new AppDbContext();
+
+        var service = new TaskService(db);
         bool rimani = true;
 
         while (rimani)

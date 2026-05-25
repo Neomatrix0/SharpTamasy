@@ -2,18 +2,29 @@ using Microsoft.EntityFrameworkCore;
 
 public class AppDbContext : DbContext
 {
+    public AppDbContext()
+    {
+    }
+
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+    {
+    }
 
     public DbSet<TaskItem> Tasks { get; set; }
-    
+
     public DbSet<BugTask> Bugs { get; set; }
 
     public DbSet<FeatureTask> Features { get; set; }
 
-     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlite("Data Source=tasks.db");
+        if (!optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseSqlite("Data Source=tasks.db");
+        }
     }
 
+   
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<TaskItem>().ToTable("Tasks");

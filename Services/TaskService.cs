@@ -3,12 +3,17 @@ using Microsoft.EntityFrameworkCore;
 
 public class TaskService
 {
+
+
+    private readonly AppDbContext _db;
+    public TaskService(AppDbContext db)
+    {
+        _db = db;
+    }
     public void AddTask(TaskItem task)
     {
-        using var db = new AppDbContext();
-       
-        db.Tasks.Add(task);
-        db.SaveChanges();
+        _db.Tasks.Add(task);
+        _db.SaveChanges();
 
     }
 
@@ -16,30 +21,27 @@ public class TaskService
 
     public void DeleteTask(int id)
     {
-         using var db = new AppDbContext();
-         var task = db.Tasks.FirstOrDefault(t => t.Id == id);
+         var task = _db.Tasks.FirstOrDefault(t => t.Id == id);
          if(task == null)
         {
             return;
         }
-        db.Tasks.Remove(task);
-         db.SaveChanges();
+        _db.Tasks.Remove(task);
+         _db.SaveChanges();
     }
 
 
     public TaskItem? GetTaskById(int id)
     {
 
-         using var db = new AppDbContext();
-         var task = db.Tasks.Find(id);
+         var task = _db.Tasks.Find(id);
          return task;
             
     }
 
     public List<TaskItem> GetAllTasks()
     {
-         using var db = new AppDbContext();
-         return db.Tasks.ToList();
+         return _db.Tasks.ToList();
          
         
     }
@@ -48,8 +50,7 @@ public class TaskService
     public void UpdateTask(int id,string newTitle, string newDescription, TaskStatus newStatus)
     {
 
-        using var db = new AppDbContext();
-          var task = db.Tasks.FirstOrDefault(t => t.Id == id);
+        var task = _db.Tasks.FirstOrDefault(t => t.Id == id);
          if(task == null)
         {
             return;
@@ -57,7 +58,7 @@ public class TaskService
         task.Title = newTitle;
         task.Description = newDescription;
         task.Status  = newStatus;
-        db.SaveChanges();
+        _db.SaveChanges();
 
        
 
@@ -67,8 +68,7 @@ public class TaskService
      public void UpdateFeaturePriority(int id,FeaturePriority newPriority)
     {
 
-        using var db = new AppDbContext();
-          var task = db.Tasks.FirstOrDefault(t => t.Id == id);
+          var task = _db.Tasks.FirstOrDefault(t => t.Id == id);
          if(task is not FeatureTask feature)
         {
             return;
@@ -76,15 +76,14 @@ public class TaskService
       
         feature.Priority = newPriority;
         
-        db.SaveChanges();    
+        _db.SaveChanges();    
 
     }
 
 
     public void UpdateBugSeverity(int id, BugSeverity newSeverity)
     {
-        using var db = new AppDbContext();
-        var task =  db.Tasks.FirstOrDefault(t => t.Id == id);
+        var task = _db.Tasks.FirstOrDefault(t => t.Id == id);
 
          if (task is not BugTask bug)
     {
@@ -93,7 +92,7 @@ public class TaskService
         
         bug.Severity = newSeverity;
         
-        db.SaveChanges();
+        _db.SaveChanges();
     }
 }
 
