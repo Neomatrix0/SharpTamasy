@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SharpTamasy\SharpTamasy.csproj" />
+    <ProjectReference Include="..\SharpTamasy.csproj" />
   </ItemGroup>
 
 </Project>
