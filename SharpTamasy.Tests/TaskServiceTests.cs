@@ -32,6 +32,25 @@ public class TaskServiceTests
         Assert.Equal("Unit test", db.Tasks.First().Description);
     }
 
+    [Fact]
+    public void AddTask_ShouldSaveAssignedTo()
+    {
+        using var db = CreateDbContext();
+        var service = new TaskService(db);
+
+        var task = new TaskItem
+        {
+            Title = "Preparare demo",
+            Description = "Mostrare la nuova feature",
+            AssignedTo = "Daniel"
+        };
+
+        service.AddTask(task);
+
+        var savedTask = Assert.Single(db.Tasks);
+        Assert.Equal("Daniel", savedTask.AssignedTo);
+    }
+
      [Fact]
     public void DeleteTask_WithExistingId_ShouldRemoveTask()
     {
@@ -164,6 +183,46 @@ public class TaskServiceTests
         Assert.Equal("Titolo originale", unchangedTask.Title);
         Assert.Equal("Descrizione originale", unchangedTask.Description);
         Assert.Equal(TaskStatus.Opened, unchangedTask.Status);
+    }
+
+    [Fact]
+    public void UpdateAssignedTo_WithExistingId_ShouldUpdateAssignedTo()
+    {
+        using var db = CreateDbContext();
+        var service = new TaskService(db);
+        var task = new TaskItem
+        {
+            Title = "Task assegnata",
+            Description = "Cambio assegnatario",
+            AssignedTo = "Daniel"
+        };
+        db.Tasks.Add(task);
+        db.SaveChanges();
+
+        service.UpdateAssignedTo(task.Id, "Sara");
+
+        var updatedTask = Assert.Single(db.Tasks);
+        Assert.Equal("Sara", updatedTask.AssignedTo);
+    }
+
+    [Fact]
+    public void UpdateAssignedTo_WithMissingId_ShouldLeaveExistingTaskUntouched()
+    {
+        using var db = CreateDbContext();
+        var service = new TaskService(db);
+        var task = new TaskItem
+        {
+            Title = "Task assegnata",
+            Description = "Non deve cambiare",
+            AssignedTo = "Daniel"
+        };
+        db.Tasks.Add(task);
+        db.SaveChanges();
+
+        service.UpdateAssignedTo(task.Id + 1, "Sara");
+
+        var unchangedTask = Assert.Single(db.Tasks);
+        Assert.Equal("Daniel", unchangedTask.AssignedTo);
     }
 
     [Fact]

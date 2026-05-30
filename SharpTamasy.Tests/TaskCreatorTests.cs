@@ -10,7 +10,8 @@ public class TaskCreatorTests
         {
             Title = "Bug login",
             Description = "Errore login",
-            Severity = BugSeverity.High
+            Severity = BugSeverity.High,
+            AssignedTo = "Daniel"
         };
 
         var task = creator.CreateTask(data);
@@ -20,6 +21,7 @@ public class TaskCreatorTests
         Assert.Equal("Errore login", bugTask.Description);
         Assert.Equal(BugSeverity.High, bugTask.Severity);
         Assert.Equal(TaskType.Bug, bugTask.Type);
+        Assert.Equal("Daniel", bugTask.AssignedTo);
     }
 
     [Fact]
@@ -47,7 +49,8 @@ public class TaskCreatorTests
         {
             Title = "New Feature",
             Description = "implement new operation",
-            Priority = FeaturePriority.Normal
+            Priority = FeaturePriority.Normal,
+            AssignedTo = "Sara"
         };
 
         var task = creator.CreateTask(data);
@@ -57,6 +60,7 @@ public class TaskCreatorTests
         Assert.Equal("implement new operation", featureTask.Description);
         Assert.Equal(FeaturePriority.Normal, featureTask.Priority);
         Assert.Equal(TaskType.Feature, featureTask.Type);
+        Assert.Equal("Sara", featureTask.AssignedTo);
     }
 
     [Fact]
@@ -83,7 +87,8 @@ public class TaskCreatorTests
         var data = new TaskCreationData
         {
             Title = "New Basic task",
-            Description = "Normal operation"
+            Description = "Normal operation",
+            AssignedTo = "Marco"
         };
 
         var task = creator.CreateTask(data);
@@ -92,6 +97,7 @@ public class TaskCreatorTests
         Assert.Equal("New Basic task", task.Title);
         Assert.Equal("Normal operation", task.Description);
         Assert.Equal(TaskType.Task, task.Type);
+        Assert.Equal("Marco", task.AssignedTo);
     }
 
     [Fact]
