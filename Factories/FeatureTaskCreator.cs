@@ -7,7 +7,8 @@ public class FeatureTaskCreator : TaskCreator
         {
             Title = data.Title,
             Description = data.Description,
-            Priority = data.Priority ?? FeaturePriority.Low
+            Priority = data.Priority ?? FeaturePriority.Low,
+            AssignedTo = data.AssignedTo
         };
     }
     

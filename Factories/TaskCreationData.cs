@@ -4,5 +4,7 @@ public class TaskCreationData{
     public BugSeverity? Severity{get;set;}
 
     public FeaturePriority? Priority {get;set;}
+
+    public string AssignedTo {get;set;} = string.Empty;
     
 }

@@ -5,7 +5,8 @@ public class BasicTaskCreator : TaskCreator
        return new TaskItem
        {
         Title = data.Title,
-        Description = data.Description
+        Description = data.Description,
+        AssignedTo = data.AssignedTo
            
        };
     

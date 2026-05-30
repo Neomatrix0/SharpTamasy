@@ -37,6 +37,8 @@ public class TaskItem
 
     public TaskType Type { get; protected set; } = TaskType.Task;
 
+    public string AssignedTo {get; set;} = string.Empty;
+
 
 }
 

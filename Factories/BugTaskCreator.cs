@@ -6,7 +6,8 @@ public class BugTaskCreator : TaskCreator
        {
         Title = data.Title,
         Description = data.Description,
-        Severity = data.Severity ?? BugSeverity.Low
+        Severity = data.Severity ?? BugSeverity.Low,
+        AssignedTo = data.AssignedTo
            
        };
     

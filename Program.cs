@@ -33,6 +33,9 @@ public class Program
                     Console.Write("Descrizione: ");
                     string description = Console.ReadLine() ?? string.Empty;
 
+                    Console.Write("Assegnato a: ");
+                    string assignedTo = Console.ReadLine() ?? string.Empty;
+
                     Console.WriteLine("Tipo di task:");
                     Console.WriteLine("1. Task normale");
                     Console.WriteLine("2. Bug task");
@@ -46,7 +49,8 @@ public class Program
                     var data = new TaskCreationData
                     {
                         Title = title,
-                        Description = description
+                        Description = description,
+                        AssignedTo = assignedTo
                     };
 
                     switch (tipoScelta)
@@ -112,7 +116,7 @@ public class Program
                     {
                         foreach (var task in tasks)
                         {
-                            Console.WriteLine($"{task.Id} - {task.Title} - {task.Description} - {task.CreatedAt} - {task.Status} - {task.Type}");
+                            Console.WriteLine($"{task.Id} - {task.Title} - {task.Description} - {task.CreatedAt} - {task.Status} - {task.Type} - Assegnato a: {task.AssignedTo}");
                         }
                     }
                     break;
@@ -130,7 +134,7 @@ public class Program
                         }
                         else
                         {
-                            Console.WriteLine($"{taskById.Id} - {taskById.Title} - {taskById.Description} - {taskById.CreatedAt} - {taskById.Status} - {taskById.Type}");
+                            Console.WriteLine($"{taskById.Id} - {taskById.Title} - {taskById.Description} - {taskById.CreatedAt} - {taskById.Status} - {taskById.Type} - Assegnato a: {taskById.AssignedTo}");
 
                             if (taskById is BugTask bug)
                             {
@@ -184,13 +188,21 @@ public class Program
                         }
                         else
                         {
-                            Console.WriteLine($"{existingTask.Id} - {existingTask.Title} - {existingTask.Description} - {existingTask.CreatedAt} - {existingTask.Status} - {existingTask.Type}");
+                            Console.WriteLine($"{existingTask.Id} - {existingTask.Title} - {existingTask.Description} - {existingTask.CreatedAt} - {existingTask.Status} - {existingTask.Type} - Assegnato a: {existingTask.AssignedTo}");
 
                             Console.Write("Nuovo titolo (lascia vuoto per mantenere): ");
                             string newTitle = Console.ReadLine() ?? string.Empty;
 
                             Console.Write("Nuova descrizione (lascia vuoto per mantenere): ");
                             string newDescription = Console.ReadLine() ?? string.Empty;
+
+                            Console.Write("Nuovo assegnatario (lascia vuoto per mantenere): ");
+                            string newAssignedTo = Console.ReadLine() ?? string.Empty;
+
+                            if (!string.IsNullOrWhiteSpace(newAssignedTo))
+                            {
+                                service.UpdateAssignedTo(editId, newAssignedTo);
+                            }
 
                             Console.Write("Nuovo stato (1.Opened, 2.Completed, lascia vuoto per mantenere): ");
                             string? statusChoice = Console.ReadLine();

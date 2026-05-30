@@ -94,6 +94,17 @@ public class TaskService
         
         _db.SaveChanges();
     }
+
+    public void UpdateAssignedTo(int id,string assignedTo)
+    {
+        var task = _db.Tasks.FirstOrDefault(t => t.Id == id);
+        if(task == null)
+        {
+            return;
+        }
+        task.AssignedTo = assignedTo;
+        _db.SaveChanges();
+    }
 }
 
 
