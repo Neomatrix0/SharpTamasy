@@ -1,8 +1,11 @@
-﻿public class Program
+using Microsoft.EntityFrameworkCore;
+
+public class Program
 {
     static void Main(string[] args)
     {
         using var db = new AppDbContext();
+        db.Database.Migrate();
 
         var service = new TaskService(db);
         bool rimani = true;
@@ -15,6 +18,7 @@
             Console.WriteLine("2. Mostra tutte le task");
             Console.WriteLine("3. Cerca task per id");
             Console.WriteLine("4. Elimina task");
+            Console.WriteLine("5. Modifica task");
             Console.WriteLine("0. Esci");
             Console.Write("Scegli un'opzione: ");
 
@@ -52,7 +56,7 @@
                             break;
 
                         case "2":
-                            Console.Write("Severità (1.Low, 2.Medium, 3.High): ");
+                            Console.Write("Severita (1.Low, 2.Medium, 3.High): ");
                             string? severityChoice = Console.ReadLine();
 
                             data.Severity = severityChoice switch
@@ -67,7 +71,7 @@
                             break;
 
                         case "3":
-                            Console.Write("Priorità (1.Low, 2.Normal, 3.Urgent): ");
+                            Console.Write("Priorita (1.Low, 2.Normal, 3.Urgent): ");
                             string? priorityChoice = Console.ReadLine();
 
                             data.Priority = priorityChoice switch
@@ -159,6 +163,94 @@
                         {
                             service.DeleteTask(deleteId);
                             Console.WriteLine("Task eliminata con successo.");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Id non valido.");
+                    }
+                    break;
+
+                case "5":
+                    Console.Write("Inserisci Id da modificare: ");
+
+                    if (int.TryParse(Console.ReadLine(), out int editId))
+                    {
+                        var existingTask = service.GetTaskById(editId);
+
+                        if (existingTask == null)
+                        {
+                            Console.WriteLine("Task non trovata.");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"{existingTask.Id} - {existingTask.Title} - {existingTask.Description} - {existingTask.CreatedAt} - {existingTask.Status} - {existingTask.Type}");
+
+                            Console.Write("Nuovo titolo (lascia vuoto per mantenere): ");
+                            string newTitle = Console.ReadLine() ?? string.Empty;
+
+                            Console.Write("Nuova descrizione (lascia vuoto per mantenere): ");
+                            string newDescription = Console.ReadLine() ?? string.Empty;
+
+                            Console.Write("Nuovo stato (1.Opened, 2.Completed, lascia vuoto per mantenere): ");
+                            string? statusChoice = Console.ReadLine();
+
+                            string updatedTitle = string.IsNullOrWhiteSpace(newTitle)
+                                ? existingTask.Title
+                                : newTitle;
+
+                            string updatedDescription = string.IsNullOrWhiteSpace(newDescription)
+                                ? existingTask.Description
+                                : newDescription;
+
+                            TaskStatus updatedStatus = statusChoice switch
+                            {
+                                "1" => TaskStatus.Opened,
+                                "2" => TaskStatus.Completed,
+                                _ => existingTask.Status
+                            };
+
+                            service.UpdateTask(editId, updatedTitle, updatedDescription, updatedStatus);
+
+                            if (existingTask is BugTask)
+                            {
+                                Console.Write("Nuova severita (1.Low, 2.Medium, 3.High, lascia vuoto per mantenere): ");
+                                string? severityChoice = Console.ReadLine();
+
+                                BugSeverity? newSeverity = severityChoice switch
+                                {
+                                    "1" => BugSeverity.Low,
+                                    "2" => BugSeverity.Medium,
+                                    "3" => BugSeverity.High,
+                                    _ => null
+                                };
+
+                                if (newSeverity.HasValue)
+                                {
+                                    service.UpdateBugSeverity(editId, newSeverity.Value);
+                                }
+                            }
+
+                            if (existingTask is FeatureTask)
+                            {
+                                Console.Write("Nuova priorita (1.Low, 2.Normal, 3.Urgent, lascia vuoto per mantenere): ");
+                                string? priorityChoice = Console.ReadLine();
+
+                                FeaturePriority? newPriority = priorityChoice switch
+                                {
+                                    "1" => FeaturePriority.Low,
+                                    "2" => FeaturePriority.Normal,
+                                    "3" => FeaturePriority.Urgent,
+                                    _ => null
+                                };
+
+                                if (newPriority.HasValue)
+                                {
+                                    service.UpdateFeaturePriority(editId, newPriority.Value);
+                                }
+                            }
+
+                            Console.WriteLine("Task aggiornata con successo.");
                         }
                     }
                     else
