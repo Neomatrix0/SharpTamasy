@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="SharpTamasy.csproj" />
+  <Project Path="SharpTamasy.Tests/SharpTamasy.Tests.csproj" />
+</Solution>
