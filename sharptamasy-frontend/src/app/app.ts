@@ -14,6 +14,8 @@ export class App implements OnInit {
   showForm = signal(false);
   isSubmitting = signal(false);
   submitError = signal('');
+  deletingTaskId = signal<number | null>(null);
+  deleteError = signal('');
   newTask: CreateTaskRequest = this.emptyTask();
 
   constructor(private taskService: TaskService) {}
@@ -70,5 +72,26 @@ export class App implements OnInit {
       severity: 'Low',
       priority: 'Low'
     };
+  }
+
+  deleteTask(id: number): void {
+    if (this.deletingTaskId() !== null) {
+      return;
+    }
+
+    this.deletingTaskId.set(id);
+    this.deleteError.set('');
+
+    this.taskService.deleteTask(id).subscribe({
+      next: () => {
+        this.tasks.update(tasks => tasks.filter(task => task.id !== id));
+        this.deletingTaskId.set(null);
+      },
+      error: error => {
+        console.error('Error deleting task', error);
+        this.deleteError.set('Unable to delete the task.');
+        this.deletingTaskId.set(null);
+      }
+    });
   }
 }

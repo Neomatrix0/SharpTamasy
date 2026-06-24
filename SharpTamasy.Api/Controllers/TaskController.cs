@@ -52,6 +52,21 @@ public class TasksController : ControllerBase
         return CreatedAtAction(nameof(GetTasks), new { id = task.Id }, ToResponse(task));
     }
 
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteTask(int id)
+    {
+        var task = await _db.Tasks.FindAsync(id);
+        if(task is null)
+        {
+            return NotFound();
+        }
+
+        _db.Tasks.Remove(task);
+        await _db.SaveChangesAsync();
+        return NoContent();
+    }
+
     private static TaskResponse ToResponse(TaskItem task) => new(
         task.Id,
         task.Title,

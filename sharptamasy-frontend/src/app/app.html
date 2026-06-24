@@ -110,6 +110,10 @@
     }
 
     <section class="task-list">
+      @if (deleteError()) {
+        <p class="delete-error">{{ deleteError() }}</p>
+      }
+
       @for (task of tasks(); track task.id) {
         <article class="task-card">
           <div class="task-icon">☑</div>
@@ -121,7 +125,18 @@
                 <p>{{ task.description }}</p>
               </div>
 
-              <div class="task-id">ID: {{ task.id }}</div>
+              <div class="task-controls">
+                <div class="task-id">ID: {{ task.id }}</div>
+                <button
+                  type="button"
+                  class="delete-btn"
+                  [attr.aria-label]="'Delete ' + task.title"
+                  [disabled]="deletingTaskId() !== null"
+                  (click)="deleteTask(task.id)"
+                >
+                  {{ deletingTaskId() === task.id ? 'Deleting...' : 'Delete' }}
+                </button>
+              </div>
             </div>
 
             <div class="task-meta">
