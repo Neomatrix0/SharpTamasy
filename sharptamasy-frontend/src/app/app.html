@@ -1,15 +1,61 @@
-<p>Numero task: {{ tasks().length }}</p>
+<div class="page">
+  <aside class="sidebar">
+    <div class="logo">▰</div>
 
-<ul>
-  @for (task of tasks(); track task.id) {
-    <li>
-      <strong>{{ task.title }}</strong><br>
-      {{ task.description }}<br>
-      Type: {{ task.type }}<br>
-      Status: {{ task.status }}<br>
-      Assigned to: {{ task.assignedTo }}
-    </li>
-  } @empty {
-    <li>No tasks found.</li>
-  }
-</ul>
+    <nav>
+      <a class="nav-item active">🏠 Overview</a>
+      <a class="nav-item">📋 Boards</a>
+    </nav>
+  </aside>
+
+  <main class="content">
+    <header class="topbar">
+      <h1>SharpTamasy</h1>
+    </header>
+
+    <section class="section-header">
+      <h2>Tasks</h2>
+    </section>
+
+    <section class="summary-card">
+      <h2>Numero task: <span>{{ tasks().length }}</span></h2>
+      <button class="new-task-btn">+ New Task</button>
+    </section>
+
+    <section class="task-list">
+      @for (task of tasks(); track task.id) {
+        <article class="task-card">
+          <div class="task-icon">☑</div>
+
+          <div class="task-content">
+            <div class="task-main">
+              <div>
+                <h3>{{ task.title }}</h3>
+                <p>{{ task.description }}</p>
+              </div>
+
+              <div class="task-id">ID: {{ task.id }}</div>
+            </div>
+
+            <div class="task-meta">
+              <span class="meta-label">🏷 Type</span>
+              <span class="badge blue">{{ task.type }}</span>
+
+              <span class="meta-label">◷ Status</span>
+              <span class="badge blue">{{ task.status }}</span>
+
+              <span class="meta-label">♙ Assigned to</span>
+              <span class="badge gray">{{ task.assignedTo || 'Unassigned' }}</span>
+            </div>
+          </div>
+        </article>
+      } @empty {
+        <article class="empty-card">
+          <div class="empty-icon">▱</div>
+          <h3>No tasks found.</h3>
+          <p>Create a new task to get started.</p>
+        </article>
+      }
+    </section>
+  </main>
+</div>
