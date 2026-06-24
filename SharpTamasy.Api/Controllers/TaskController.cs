@@ -18,44 +18,47 @@ public class TasksController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetTasks()
     {
-        var tasks = await _db.Tasks
+        var taskEntities = await _db.Tasks
             .AsNoTracking()
             .OrderByDescending(t => t.Id)
-            .Select(t => new
-            {
-                t.Id,
-                t.Title,
-                t.Description,
-                Type = t.Type.ToString(),
-                Status = t.Status.ToString(),
-                t.AssignedTo
-            })
             .ToListAsync();
 
-        return Ok(tasks);
+        return Ok(taskEntities.Select(ToResponse));
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateTask([FromBody] CreateTaskRequest data)
     {
-        var task = new TaskItem
+        TaskItem task = data.Type switch
         {
-            Title = data.Title,
-            Description = data.Description,
-            AssignedTo = data.AssignedTo
+            TaskType.Bug => new BugTask
+            {
+                Severity = data.Severity ?? BugSeverity.Low
+            },
+            TaskType.Feature => new FeatureTask
+            {
+                Priority = data.Priority ?? FeaturePriority.Low
+            },
+            _ => new TaskItem()
         };
+
+        task.Title = data.Title.Trim();
+        task.Description = data.Description.Trim();
+        task.AssignedTo = data.AssignedTo.Trim();
 
         _db.Tasks.Add(task);
         await _db.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetTasks), new { id = task.Id }, new
-        {
-            task.Id,
-            task.Title,
-            task.Description,
-            Type = task.Type.ToString(),
-            Status = task.Status.ToString(),
-            task.AssignedTo
-        });
+        return CreatedAtAction(nameof(GetTasks), new { id = task.Id }, ToResponse(task));
     }
+
+    private static TaskResponse ToResponse(TaskItem task) => new(
+        task.Id,
+        task.Title,
+        task.Description,
+        task.Type.ToString(),
+        task.Status.ToString(),
+        task.AssignedTo,
+        task is BugTask bug ? bug.Severity.ToString() : null,
+        task is FeatureTask feature ? feature.Priority.ToString() : null);
 }

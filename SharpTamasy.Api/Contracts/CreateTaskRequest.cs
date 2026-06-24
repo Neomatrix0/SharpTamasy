@@ -10,4 +10,10 @@ public sealed class CreateTaskRequest
     public string Description { get; init; } = string.Empty;
 
     public string AssignedTo { get; init; } = string.Empty;
+
+    public TaskType Type { get; init; } = TaskType.Task;
+
+    public BugSeverity? Severity { get; init; }
+
+    public FeaturePriority? Priority { get; init; }
 }

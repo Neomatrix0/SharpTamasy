@@ -19,8 +19,95 @@
 
     <section class="summary-card">
       <h2>Numero task: <span>{{ tasks().length }}</span></h2>
-      <button class="new-task-btn">+ New Task</button>
+      <button
+        type="button"
+        class="new-task-btn"
+        (click)="showForm.set(!showForm())"
+      >
+        {{ showForm() ? 'Cancel' : '+ New Task' }}
+      </button>
     </section>
+
+    @if (showForm()) {
+      <form class="task-form" #taskForm="ngForm" (ngSubmit)="submitTask()">
+        <div class="form-field">
+          <label for="task-title">Title</label>
+          <input
+            id="task-title"
+            name="title"
+            type="text"
+            [(ngModel)]="newTask.title"
+            maxlength="200"
+            required
+          >
+        </div>
+
+        <div class="form-field form-field-wide">
+          <label for="task-description">Description</label>
+          <textarea
+            id="task-description"
+            name="description"
+            rows="3"
+            [(ngModel)]="newTask.description"
+          ></textarea>
+        </div>
+
+        <div class="form-field">
+          <label for="task-assignee">Assigned to</label>
+          <input
+            id="task-assignee"
+            name="assignedTo"
+            type="text"
+            [(ngModel)]="newTask.assignedTo"
+          >
+        </div>
+
+        <div class="form-field">
+          <label for="task-type">Type</label>
+          <select id="task-type" name="type" [(ngModel)]="newTask.type">
+            <option value="Task">Task</option>
+            <option value="Bug">Bug</option>
+            <option value="Feature">Feature</option>
+          </select>
+        </div>
+
+        @if (newTask.type === 'Bug') {
+          <div class="form-field">
+            <label for="bug-severity">Severity</label>
+            <select id="bug-severity" name="severity" [(ngModel)]="newTask.severity">
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
+          </div>
+        }
+
+        @if (newTask.type === 'Feature') {
+          <div class="form-field">
+            <label for="feature-priority">Priority</label>
+            <select id="feature-priority" name="priority" [(ngModel)]="newTask.priority">
+              <option value="Low">Low</option>
+              <option value="Normal">Normal</option>
+              <option value="Urgent">Urgent</option>
+            </select>
+          </div>
+        }
+
+        <div class="form-actions">
+          @if (submitError()) {
+            <p class="form-error">{{ submitError() }}</p>
+          }
+
+          <button
+            type="submit"
+            class="create-task-btn"
+            [disabled]="taskForm.invalid || isSubmitting()"
+          >
+            {{ isSubmitting() ? 'Creating...' : 'Create Task' }}
+          </button>
+        </div>
+      </form>
+    }
 
     <section class="task-list">
       @for (task of tasks(); track task.id) {
@@ -46,6 +133,16 @@
 
               <span class="meta-label">♙ Assigned to</span>
               <span class="badge gray">{{ task.assignedTo || 'Unassigned' }}</span>
+
+              @if (task.severity) {
+                <span class="meta-label">Severity</span>
+                <span class="badge gray">{{ task.severity }}</span>
+              }
+
+              @if (task.priority) {
+                <span class="meta-label">Priority</span>
+                <span class="badge gray">{{ task.priority }}</span>
+              }
             </div>
           </div>
         </article>
